@@ -1,0 +1,309 @@
+<div id="acts-detail" ng-controller="ActsDetailCtrl" class="scrollable ui-layout-center" ng-show="stateService.isParam('activity_id')">
+    <!-- loader-->
+    <!--<md-progress-circular class="loader" md-mode="indeterminate" ng-show="loading" md-diameter="250"></md-progress-circular>-->
+
+    <!-- individual activity detail-->
+    <div class="act-panel" ng-show="selectedActivity && !loading">
+        <md-grid-list md-cols="3" md-row-height="fit" class="stats">
+            <md-grid-tile class="stat">
+                <md-content>
+                    <div class="title">Investment:</div>
+                    <div class="data" ng-show="selectedActivity.overviewDetails.total_amount">{{selectedActivity.overviewDetails.total_amount | currency:"USD $":0 }} {{selectedActivity.overviewDetails.currency | currency:"USD $":0 }}</div>
+                    <div class="data" ng-show="!selectedActivity.overviewDetails.total_amount">no information</div>
+                </md-content>
+            </md-grid-tile>
+            <md-grid-tile class="stat">
+                <md-content ng-show="page.tools.map.params.showCountry">
+                    <div class="title">Country:</div>
+                    <div class="data">{{selectedActivity.locationDetails[0].country }}</div>
+                    <div class="data" ng-show="!selectedActivity.locationDetails[0].country ">no information</div>
+                </md-content>
+                <md-content ng-show="!page.tools.map.params.showCountry">
+                    <div class="title">{{terminology.funder_terminology.singular}}:</div>
+                    <div class="data">{{selectedActivity.organizationDetails.fundingOrgs | filterDetailOrgs}}</div>
+                </md-content>
+            </md-grid-tile>
+            <md-grid-tile class="stat">
+                <md-content>
+                    <div class="title" ng-show="selectedActivity.parent_id == null">{{terminology.activity_terminology.singular}} status:</div>
+                    <div class="title" ng-show="selectedActivity.parent_id != null">Activity status:</div>
+
+                    <div class="data">{{selectedActivity.taxonomyDetails.activity_status}}</div>
+                    <div class="data" ng-show="!selectedActivity.taxonomyDetails.activity_status">no information</div>
+                </md-content>
+            </md-grid-tile>
+        </md-grid-list>
+        <div class="overview" ng-class="{wide: !(selectedActivity.locationDetails.length > 0)}">
+            <div class="description">
+                <!-- parent -->
+                <div class="act-title" ng-show="selectedActivity.parent_id == null">{{terminology.activity_terminology.singular}} description: </div>
+                <!-- child -->
+                <div class="act-title" ng-show="selectedActivity.parent_id != null">Activity description: </div>
+                <div class="activity-detail-data" ng-show="selectedActivity._description">{{selectedActivity._description}}</div>
+                <!-- parent-->
+                <div class="activity-detail-data" ng-show="!selectedActivity._description && selectedActivity.parent_id == null">There is no description for this {{terminology.activity_terminology.singular}} </div>
+               <!-- child-->
+                <div class="activity-detail-data" ng-show="!selectedActivity._description && selectedActivity.parent_id != null">There is no description for this activity.</div>
+            </div>
+            <!-- map of locations-->
+            <div class="map-container" ng-show="(selectedActivity.locationDetails.length > 0)">
+                <div id="acts-map"></div>
+                <div class="legend">
+                    <div class="key admin1"></div>
+                    <div class="key-label">{{terminology.boundary_terminology.singular.admin1}}</div>
+                    <div class="key admin2"></div>
+                    <div class="key-label">{{terminology.boundary_terminology.singular.admin2}}</div>
+                    <div class="key admin3"></div>
+                    <div class="key-label">{{terminology.boundary_terminology.singular.admin3}}</div>
+                </div>
+            </div>
+            <md-progress-circular class="loader map" md-mode="indeterminate" ng-show="mapLoading" md-diameter="250"></md-progress-circular>
+
+        </div>
+
+
+        <md-tabs md-dynamic-height md-border-bottom>
+            <md-tab label="overview">
+                <md-content class="md-padding">
+                    <div class="general-info">
+                        <div class="activity-detail-data">
+                            <!-- start date -->
+                            <div class="info-data">
+                                <div class="info-header">Start date:</div>
+                                <div class="info-content" ng-show="!selectedActivity.overviewDetails.start_date">No date available</div>
+                                <div class="info-content" ng-show="selectedActivity.overviewDetails.start_date"> {{selectedActivity.overviewDetails.start_date | date : 'yyyy/MM/dd'}}</div>
+                            </div>
+                            <!-- end date -->
+                            <div class="info-data">
+                                <div class="info-header">End date:</div>
+                                <div class="info-content" ng-show="!selectedActivity.overviewDetails.end_date">No date available</div>
+                                <div class="info-content" ng-show="selectedActivity.overviewDetails.end_date"> {{selectedActivity.overviewDetails.end_date | date : 'yyyy/MM/dd'}}</div>
+                            </div>
+                            <!-- total financials -->
+                            <div class="info-data">
+                                <div class="info-header">Total Investment:</div>
+                                <div class="info-content" ng-show="!selectedActivity.overviewDetails.total_amount">No data available</div>
+                                <div class="info-content" ng-show="selectedActivity.overviewDetails.total_amount"> {{selectedActivity.overviewDetails.total_amount | currency:"USD $":0 }} {{selectedActivity.overviewDetails.currency| currency:"USD $":0}}
+                                </div>
+                            </div>
+                            <!-- activity_status -->
+                            <div class="info-data">
+                                <!-- parent-->
+                                <div class="info-header" ng-show="selectedActivity.overviewDetails.activity_status && selectedActivity.parent_id == null">{{terminology.activity_terminology.singular}} Status:</div>
+                                <!-- child -->
+                                <div class="info-header" ng-show="selectedActivity.overviewDetails.activity_status && selectedActivity.parent_id != null">Activity Status:</div>
+                                <div class="info-content" ng-show="selectedActivity.overviewDetails.activity_status"> {{selectedActivity.overviewDetails.activity_status}}</div>
+                            </div>
+                            <!-- IATI sector Category -->
+                            <div class="info-data">
+                                <div class="info-header" ng-show="selectedActivity.overviewDetails.sector_category">Sector Category:</div>
+                                <div class="info-content" ng-show="selectedActivity.overviewDetails.sector_category"> {{selectedActivity.overviewDetails.sector_category}}</div>
+                            </div>
+                            <!-- IATI Sector -->
+                            <div class="info-data">
+                                <div class="info-header" ng-show="selectedActivity.overviewDetails.sector">Sector:</div>
+                                <div class="info-content" ng-show="selectedActivity.overviewDetails.sector"> {{selectedActivity.overviewDetails.sector}}</div>
+                            </div>
+
+                            <!-- data group id -->
+                            <div class="info-data">
+                                <div class="info-header" ng-show="selectedActivity.overviewDetails.data_group">Data Group:</div>
+                                <div class="info-content" ng-show="selectedActivity.overviewDetails.data_group"> {{selectedActivity.overviewDetails.data_group}}</div>
+                            </div>
+                            <!-- tags -->
+                            <div class="info-data">
+                                <div class="info-header" ng-show="selectedActivity.overviewDetails.tags">Tags:</div>
+                                <div class="info-content" ng-show="selectedActivity.overviewDetails.tags"> {{selectedActivity.overviewDetails.tags}}</div>
+                            </div>
+                            <!-- content -->
+                            <div class="info-data">
+                                <div class="info-header" ng-show="selectedActivity.overviewDetails.content">Content:</div>
+                                <div class="info-content" ng-show="selectedActivity.overviewDetails.content"> {{selectedActivity.overviewDetails.content}}</div>
+                            </div>
+                            <!-- objective -->
+                            <div class="info-data objective" >
+                                <div class="info-header" ng-show="selectedActivity.overviewDetails.objective">Objective:</div>
+                                <div class="info-content" ng-show="selectedActivity.overviewDetails.objective"> {{selectedActivity.overviewDetails.objective}}</div>
+                            </div>
+                        </div>
+                        <div class="activity-detail-data contacts" ng-show="selectedActivity.contacts.length > 0">
+                            <div class='contact-title'>Contacts:</div>
+                            <div ng-repeat="contact in selectedActivity.contacts">
+                                <div class="info-data">
+                                    <div class="info-header" ng-show="contact._name || contact._first_name || contact._last_name">Name:</div>
+                                    <div class="info-content" ng-show="contact._name"> {{contact._name}}</div>
+                                    <div class="info-content" ng-show="!contact._name"> {{contact._first_name}} {{contact._last_name}}</div>
+                                </div>
+                                <div class="info-data">
+                                    <div class="info-header" ng-show="contact.title">Title:</div>
+                                    <div class="info-content" ng-show="contact.title"> {{contact.title}}</div>
+                                </div>
+                                <div class="info-data">
+                                    <div class="info-header" ng-show="contact.organization">Organization:</div>
+                                    <div class="info-content" ng-show="contact.organization"> {{contact.organization.organization}}</div>
+                                </div>
+                                <div class="info-data">
+                                    <div class="info-header" ng-show="contact._email">Email:</div>
+                                    <div class="info-content" ng-show="contact._email"> {{contact._email}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="activity-detail-data resources" ng-show="selectedActivity.overviewDetails.additionalResources.length > 0">
+                            <div class='resource-title'>Additional Resources:</div>
+                            <div ng-repeat="r in selectedActivity.overviewDetails.additionalResources track by $index">
+                                <div class="story-button"><i class="material-icons">{{r.type}}</i><a ng-href={{r.url}} target="_blank">{{r.title}}</a></div>
+                            </div>
+                        </div>
+                    </div>
+                </md-content>
+            </md-tab>
+            <md-tab label="taxonomies">
+                <md-content class="md-padding">
+                    <div class="taxonomies">
+                        <div class="activity-detail-data">
+                            <!-- parent -->
+                            <div class='no-info' ng-show="!selectedActivity.taxonomyDetails && selectedActivity.parent_id == null">There is no taxonomy information for this {{terminology.activity_terminology.singular}}</div>
+                            <!-- child -->
+                            <div class='no-info' ng-show="!selectedActivity.taxonomyDetails && selectedActivity.parent_id != null">There is no taxonomy information for this activity.</div>
+
+                            <!-- activity status-->
+                            <div class="info-data">
+                                <!-- parent -->
+                                <div class="info-header" ng-show="selectedActivity.taxonomyDetails.activity_status && selectedActivity.parent_id == null">{{terminology.activity_terminology.singular}} Status:</div>
+                                <!-- child -->
+                                <div class="info-header" ng-show="selectedActivity.taxonomyDetails.activity_status && selectedActivity.parent_id != null">Activity Status:</div>
+                                <div class="info-content" ng-show="selectedActivity.taxonomyDetails.activity_status">{{selectedActivity.taxonomyDetails.activity_status}}</div>
+                            </div>
+                            <!-- sector category-->
+                            <div class="info-data">
+                                <div class="info-header" ng-show="selectedActivity.taxonomyDetails.sector_category">Sector Category:</div>
+                                <div class="info-content" ng-show="selectedActivity.taxonomyDetails.sector_category">{{selectedActivity.taxonomyDetails.sector_category}}</div>
+                            </div>
+                            <!-- sector -->
+                            <div class="info-data">
+                                <div class="info-header" ng-show="selectedActivity.taxonomyDetails.sector">Sector:</div>
+                                <div class="info-content" ng-show="selectedActivity.taxonomyDetails.sector">{{selectedActivity.taxonomyDetails.sector}}</div>
+                            </div>
+                            <!-- sector category-->
+                            <div class="info-data">
+                                <!-- parent -->
+                                <div class="info-header" ng-show="selectedActivity.taxonomyDetails.activity_scope  && selectedActivity.parent_id == null ">{{terminology.activity_terminology.singular}} Scope:</div>
+                                <!--  child -->
+                                <div class="info-header" ng-show="selectedActivity.taxonomyDetails.activity_scope  && selectedActivity.parent_id != null ">Activity Scope:</div>
+                                <div class="info-content" ng-show="selectedActivity.taxonomyDetails.activity_scope">{{selectedActivity.taxonomyDetails.activity_scope}}</div>
+                            </div>
+                            <!-- custom taxonomy -->
+                            <div ng-repeat="(key,value) in selectedActivity.taxonomyDetails.custom_taxonomy">
+                                <div class="info-data">
+                                    <div class="info-header" ng-show="value">{{key}}:</div>
+                                    <div class="info-content" ng-show="value">{{value}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </md-content>
+            </md-tab>
+            <md-tab label="financials">
+                <md-content class="md-padding">
+                    <div class="financials">
+                        <!-- financial data -->
+                        <div class="activity-detail-title">Total Investment : {{selectedActivity.overviewDetails.total_amount | currency:"USD $":0}} {{selectedActivity.overviewDetails.currency| currency:"USD $":0}}</div>
+                        <!-- parent-->
+                        <div class='no-info' ng-show="!(selectedActivity.financialsDetails.length > 0) && selectedActivity.parent_id == null ">There is no financial information for this {{terminology.activity_terminology.singular}}</div>
+                        <!-- child-->
+                        <div class='no-info' ng-show="!(selectedActivity.financialsDetails.length > 0) && selectedActivity.parent_id != null ">There is no financial information for this activity.</div>
+
+                        <table ng-show="(selectedActivity.financialsDetails.length > 0)">
+                            <tr>
+                                <th>{{terminology.funder_terminology.singular}}</th>
+                                <th>Recipient</th>
+                                <th>Financial Category</th>
+                                <th>Financial Type</th>
+                                <th>Transaction Type</th>
+                                <th>Amount</th>
+                                <!--<th>Start Date</th>-->
+                                <!--<th>End Date</th>-->
+                            </tr>
+                            <tr ng-repeat="financial in selectedActivity.financialsDetails" >
+                                <td>{{financial.provider}}</td>
+                                <td>{{financial.recipient}}</td>
+                                <td>{{financial.finance_category}}</td>
+                                <td>{{financial.finance_type}}</td>
+                                <td>{{financial.transaction_type}}</td>
+                                <td>{{financial.amount | currency:"USD $":0}} {{financial.currency| currency:"USD $":0}}</td>
+                                <!--<td>{{financial.start_date | date : 'yyyy/MM/dd'}}</td>-->
+                                <!--<td>{{financial.end_date | date : 'yyyy/MM/dd'}}</td>-->
+                            </tr>
+                        </table>
+                    </div>
+                </md-content>
+            </md-tab>
+            <md-tab label="organizations">
+                <md-content class="md-padding">
+                    <div class="partners">
+                        <div class="activity-detail-data">
+                            <!-- show if parent activity-->
+                            <div class='no-info' ng-show="!(selectedActivity.organizationDetails.organizationCount > 0) && selectedActivity.parent_id == null">There is no partner information for this {{terminology.activity_terminology.singular}}</div>
+                            <!-- if child activity-->
+                            <div class='no-info' ng-show="!(selectedActivity.organizationDetails.organizationCount > 0) && selectedActivity.parent_id != null">There is no partner information for this activity.</div>
+                            <div class="info-data" ng-show="selectedActivity.organizationDetails.implementingOrgs.length > 0">
+                                <div class="info-header block"> {{terminology.implementor_terminology.plural}}: </div>
+                                <div ng-repeat="org in selectedActivity.organizationDetails.implementingOrgs" class="info-content partner-data block">
+                                    <div class="link">{{org.organization}}</div>
+                                </div><br>
+                            </div>
+                            <div class="info-data" ng-show="selectedActivity.organizationDetails.fundingOrgs.length > 0">
+                                <div class="info-header block"> {{terminology.funder_terminology.plural}}: </div>
+                                <div ng-repeat="org in selectedActivity.organizationDetails.fundingOrgs" class="info-content partner-data block">
+                                    <div class="link">{{org.organization}}</div>
+                                </div><br>
+                            </div>
+                            <div class="info-data" ng-show="selectedActivity.organizationDetails.accountableOrgs.length > 0">
+                                <div class="info-header block"> Accountable Partners: </div>
+                                <div ng-repeat="org in selectedActivity.organizationDetails.accountableOrgs" class="info-content partner-data block">
+                                    <div class="link">{{org.organization}}</div>
+                                </div><br>
+                            </div>
+                        </div>
+                    </div>
+                </md-content>
+            </md-tab>
+            <md-tab label="locations">
+                <md-content class="md-padding">
+                    <div class="locations">
+                        <div class="activity-detail-title">Locations <span ng-show="selectedActivity.locationDetails[0].country">for {{selectedActivity.locationDetails[0].country}}</span> ({{selectedActivity.locationDetails.length || 0}}) :</div>
+                        <!-- location message when no location information is available -->
+                        <!-- parent activity-->
+                        <div class='no-info' ng-show="!(selectedActivity.locationDetails.length > 0) && selectedActivity.parent_id == null">There is no location information for this {{terminology.activity_terminology.singular}}</div>
+                        <!-- child activity-->
+                        <div class='no-info' ng-show="!(selectedActivity.locationDetails.length > 0) && selectedActivity.parent_id != null">There is no location information for this activity.</div>
+
+                        <ng-include ng-show="(selectedActivity.locationDetails.length===1 && selectedActivity.locationDetails[0].national_local==='National') || !subNationallocationData" ng-hide="selectedActivity.locationDetails.length === 0"
+                                    src="'acts/detail/locations/locations-national.tpl.html'"></ng-include>
+
+                        <!-- table if more than 1 location -->
+                        <table ng-show="selectedActivity.locationDetails.length >= 1 && subNationallocationData">
+                            <tr>
+                                <th>{{terminology.boundary_terminology.singular.admin1}}</th>
+                                <th>{{terminology.boundary_terminology.singular.admin2}} </th>
+                                <th ng-show="page.tools.map.params.showAdmin3">{{terminology.boundary_terminology.singular.admin3}}</th>
+                            </tr>
+                            <tr ng-repeat="location in selectedActivity.locationDetails | orderBy:['admin1','admin2', 'admin3'] " >
+                                <td>{{location.admin1}}</td>
+                                <td>{{location.admin2}}</td>
+                                <td ng-show="page.tools.map.params.showAdmin3">{{location.admin3}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </md-content>
+            </md-tab>
+            <md-tab label="related activities" data-ng-if="selectedActivity.children">
+                <md-content class="md-padding">
+                    <div class="related-activities" ng-repeat="a in selectedActivity.children | orderBy:'_title'">
+                        <div class="link" ng-click="showChildActivity(a, selectedActivity.id)">{{a._title}}</div>
+                    </div>
+                </md-content>
+            </md-tab>
+        </md-tabs>
+    </div>
+</div>

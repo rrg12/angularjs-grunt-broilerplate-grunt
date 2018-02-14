@@ -57,3 +57,8 @@ typings/
 # dotenv environment variables file
 .env
 
+# bower
+vendor
+
+# build
+build

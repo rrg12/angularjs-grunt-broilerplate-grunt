@@ -1,0 +1,15 @@
+<!-- print -->
+<md-dialog id="locs-widget-modal" aria-label="List dialog">
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 class="sub-header">Download Image</h2>
+                <md-button class="md-icon-button" ng-click="closeDialog()">
+                    <i class="material-icons">close</i>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <div class="header">{{title}}</div>
+            <div class="print" print="{{widget_id}}"><i class="material-icons">file_download</i></div>
+        </md-dialog-content>
+</md-dialog>

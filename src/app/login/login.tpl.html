@@ -1,0 +1,23 @@
+<div id="login" ng-controller="LoginCtrl">
+    <div class="login-wrapper" ng-show="!public">
+        <div class="login-container">
+            <h1 class="login-text">Log In</h1>
+            <form class="login">
+                <div class="row">
+                    <input class="user-input" name="user" id="user" type="text" ng-model="user.username" placeholder="Username" onfocus="this.placeholder = ''"
+                        onblur="this.placeholder = 'Username'">
+                </div>
+                <div class="row">
+                    <input class="user-input password" name="password" id="password" type="password" ng-model="user.password" placeholder="Password"
+                        onfocus="this.placeholder = ''" onblur="this.placeholder = 'Password'">
+                </div>
+                <div class="row">
+                    <md-button class="submit-button" ng-click="logIn(user)" type="submit" value="Log In">Log In</md-button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="login-wrapper" ng-show="public">
+        <div id="login-error" class="pmt-h2"></div>
+    </div>
+</div>

@@ -3,9 +3,9 @@
 An [AngularJS](http://angularjs.org) [Node.js](https://nodejs.org) web application broilerplate with high configurability and
 ability to build different themes/applications from single code base.
 
-* [Quick Start](#quick_start)
+* [Quick Start](#quick-start)
 
-* [Grunt Build Process](#grunt_build_process)
+* [Grunt Build Process](#grunt-build-process)
 
 * [Overall Directory Structure](#overall-directory-structure)
 
